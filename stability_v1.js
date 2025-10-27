@@ -1,4 +1,4 @@
-/* stability_v1.js — twarde logowanie + HUD + panel diagnostyczny (?diag=1) */
+/* stability_v1.js — twarde logowanie + HUD + panel diagnostyczny (?diag=1) — v12.2.6 */
 (function(){
   const NS = 'fit_stability_v1';
   const BUF_KEY = NS+':log';
@@ -28,13 +28,16 @@
     }catch(_){}
   }
 
+  // PRZECHWYTYWANIE BŁĘDÓW
   window.addEventListener('error', (e)=>{
     log('error', e.message||'window.error', {source:e.filename, line:e.lineno, col:e.colno, stack: (e.error && e.error.stack)||null});
   });
   window.addEventListener('unhandledrejection', (e)=>{
-    log('error', 'unhandledrejection', {reason: (e.reason and (e.reason.message||String(e.reason)))||String(e), stack: e.reason && e.reason.stack});
+    // ✅ POPRAWKA: używamy && zamiast "and"
+    log('error', 'unhandledrejection', {reason: (e.reason && (e.reason.message||String(e.reason)))||String(e), stack: e.reason && e.reason.stack});
   });
 
+  // Helpery
   function qs(sel, root){ const el=(root||document).querySelector(sel); if(!el) log('warn', 'qs() not found: '+sel); return el; }
   function on(el, ev, fn, opts){ try{ el && el.addEventListener(ev, fn, opts||{passive:true}); }catch(e){ log('error','on() failed '+ev,{e:String(e)}); } }
   async function fetchRetry(url, opt={}, tries=3, backoff=300){
@@ -51,6 +54,7 @@
     }
   }
 
+  // Panel diagnostyczny
   function diagPanel(){
     const wrap = document.createElement('div');
     wrap.style.cssText='position:fixed;inset:10px;background:#0b1220;color:#e2e8f0;border:1px solid #334155;border-radius:12px;z-index:99999;padding:10px;display:flex;flex-direction:column';
