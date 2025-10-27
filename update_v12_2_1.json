@@ -1,0 +1,7 @@
+{
+  "latest_version": "12.2.1",
+  "file": "https://fymruti.github.io/fit-app/index_v12_2_1.html",
+  "hash": "",
+  "filename": "index_v12_2_1.html",
+  "changelog": "Naprawione zakładki i dark mode. Fallback CSS na wypadek braku JS."
+}
