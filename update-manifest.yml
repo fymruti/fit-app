@@ -1,0 +1,44 @@
+
+name: Update manifest automatically
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'index_v*.html'
+      - '.github/workflows/update-manifest.yml'
+      - 'scripts/update_manifest.py'
+  workflow_dispatch:
+
+permissions:
+  contents: write  # allow pushing changes with GITHUB_TOKEN
+
+jobs:
+  update-manifest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Run manifest updater
+        run: |
+          python3 scripts/update_manifest.py             --user fymruti             --repo fit-app             --manifest update_v12_0_5.json
+
+      - name: Commit changes (if any)
+        run: |
+          if [[ -n "$(git status --porcelain)" ]]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add -A
+            git commit -m "chore: auto-update manifest to latest index_* (CI)"
+            git push
+          else
+            echo "No changes to commit."
+          fi
