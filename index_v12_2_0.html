@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Fit – All‑in‑One (v12.2.0)</title>
+<style>
+:root{
+  --bg:#f2f2f2; --ink:#0f172a; --ink-soft:#475569;
+  --accent:#4A90E2; --accent-dark:#357ABD;
+  --card:#e0e0e0; --input:#fafafa; --border:#cbd5e1;
+}
+body.dark{
+  --bg:#0f172a; --ink:#f1f5f9; --ink-soft:#94a3b8;
+  --accent:#60a5fa; --accent-dark:#2563eb;
+  --card:#1f2937; --input:#1e293b; --border:#334155;
+}
+*{box-sizing:border-box}
+body{ margin:0; font-family:Inter,system-ui,Segoe UI,Roboto,Arial; background:var(--bg); color:var(--ink); transition:background .3s,color .3s;}
+header{ display:grid; grid-template-columns:1fr auto; gap:10px;
+  background:linear-gradient(90deg,var(--accent),var(--accent-dark)); color:#fff; padding:10px; position:sticky; top:0; z-index:10; box-shadow:0 3px 6px rgba(0,0,0,.1);}
+.tabs{display:flex; gap:8px; flex-wrap:wrap}
+.tabs button{ padding:8px 12px; border:none; border-radius:8px; cursor:pointer; background:#fff; color:#1b3f6b; font-weight:600; box-shadow:0 2px 4px rgba(0,0,0,.15);}
+body.dark .tabs button{background:#1e293b; color:#e2e8f0}
+.tabs button.active{background:#1b3f6b; color:#fff}
+body.dark .tabs button.active{background:#60a5fa; color:#0f172a}
+.rightbar{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+.rightbar button{ border:none; border-radius:8px; padding:6px 8px; cursor:pointer; background:#fff; color:#1b3f6b;}
+body.dark .rightbar button{background:#334155; color:#f1f5f9}
+
+main{max-width:1180px; margin:0 auto; padding:12px}
+.card{ background:var(--card); border-radius:12px; padding:12px; box-shadow:0 6px 14px rgba(0,0,0,.08); margin-bottom:12px;}
+.hidden{display:none}
+.small{font-size:12px; color:var(--ink-soft)}
+</style>
+</head>
+<body>
+<header>
+  <div class="tabs" id="tabs">
+    <button class="active" data-tab="start">Start</button>
+    <button data-tab="sylwetka">Sylwetka</button>
+    <button data-tab="dieta">Dieta</button>
+    <button data-tab="jedzenie">Jedzenie</button>
+    <button data-tab="suple">Suple</button>
+  </div>
+  <div class="rightbar">
+    <button id="btnTheme" class="toggle" title="Tryb jasny/ciemny">🌙/☀️</button>
+  </div>
+</header>
+
+<main>
+  <section id="start">
+    <div class="card"><h3>Start</h3><div class="small">Wersja 12.2.0 – zakładki i dark mode naprawione.</div></div>
+  </section>
+  <section id="sylwetka" class="hidden">
+    <div class="card"><h3>Sylwetka</h3><div class="small">Sekcja przykładowa.</div></div>
+  </section>
+  <section id="dieta" class="hidden">
+    <div class="card"><h3>Dieta</h3><div class="small">Sekcja przykładowa.</div></div>
+  </section>
+  <section id="jedzenie" class="hidden">
+    <div class="card"><h3>Jedzenie</h3><div class="small">Sekcja przykładowa.</div></div>
+  </section>
+  <section id="suple" class="hidden">
+    <div class="card"><h3>Suple</h3><div class="small">Sekcja przykładowa.</div></div>
+  </section>
+</main>
+
+<script>
+/* === Stabilna inicjalizacja (v12.2.0) === */
+(function(){
+  const THEME_KEY='fit_theme_v1';
+  function applyTheme(){
+    try{
+      const stored=localStorage.getItem(THEME_KEY);
+      const prefersDark=window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const mode = stored?stored:(prefersDark?'dark':'light');
+      document.body.classList.toggle('dark', mode==='dark');
+    }catch(e){ console.warn('theme err', e); }
+  }
+  function toggleTheme(){
+    const isDark = !document.body.classList.contains('dark');
+    document.body.classList.toggle('dark', isDark);
+    try{ localStorage.setItem(THEME_KEY, isDark?'dark':'light'); }catch(_){}
+  }
+  function showTab(id){
+    document.querySelectorAll('main > section').forEach(s=>s.classList.add('hidden'));
+    const el=document.getElementById(id); if(el) el.classList.remove('hidden');
+  }
+  function initTabs(){
+    const bar=document.getElementById('tabs'); if(!bar) return;
+    const saved = sessionStorage.getItem('fit_active_tab') || bar.querySelector('button.active')?.dataset.tab || 'start';
+    showTab(saved);
+    bar.querySelectorAll('button[data-tab]').forEach(btn=>{
+      btn.classList.toggle('active', btn.dataset.tab===saved);
+      btn.addEventListener('click', (e)=>{
+        const id = btn.dataset.tab;
+        bar.querySelectorAll('button').forEach(b=>b.classList.toggle('active', b===btn));
+        showTab(id);
+        try{ sessionStorage.setItem('fit_active_tab', id); }catch(_){}
+      }, {passive:true});
+    });
+  }
+  function safeInit(){
+    try{
+      applyTheme();
+      document.getElementById('btnTheme')?.addEventListener('click', toggleTheme);
+      initTabs();
+    }catch(err){
+      console.error('init error', err);
+      alert('Błąd inicjalizacji interfejsu. Odśwież stronę (Ctrl+F5).');
+    }
+  }
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded', safeInit, {once:true});
+  }else{
+    safeInit();
+  }
+})();
+</script>
+</body>
+</html>
