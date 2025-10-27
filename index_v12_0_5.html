@@ -27,7 +27,7 @@ p.small{margin:6px 0;color:#475569;font-size:13px}
   </div>
 
 <script>
-const MANIFEST_URL = 'https://fymruti.github.io/fit-app/update_v12_0_5.json'; // ustaw swoje
+const MANIFEST_URL = 'https://fymruti.github.io/fit-app/update_v12_0_5.json';
 const APP_STORE_NS = 'fit_app_store_v1';
 const LOADER_VERSION = '12.0.5';
 const statusEl = document.getElementById('status');
@@ -77,13 +77,11 @@ async function loadLatest(){
     if(!resp.ok) { setStatus('błąd pobierania', true); return; }
     const newHtml = await resp.text();
 
-    // backup current document HTML (if any)
     try{
       const currentHtml = '<!doctype html>\n' + document.documentElement.outerHTML;
       saveBackup(currentHtml, m.latest_version || 'pre-'+Date.now());
     }catch(e){ console.warn('backup fail', e); }
 
-    // inject new HTML (replace current document)
     setStatus('ładowanie nowej wersji...');
     const w = window.open('', '_self');
     w.document.open();
@@ -105,22 +103,20 @@ function rollback(){
     const key = `${APP_STORE_NS}:backup:${last.version}`;
     const html = localStorage.getItem(key);
     if(!html){ alert('Brak danych kopii'); return; }
-    // pobierz jako plik do otwarcia
     downloadAsFile(html, `fit-all-in-one_v${last.version}_backup.html`);
     setStatus('pobrano kopię v'+last.version);
-  }catch(e){ console.error(e); alert('Błąd przywracania'); }
+  }catch(e){
+    console.error(e);
+    alert('Błąd przywracania');
+  }
 }
 
 btn.addEventListener('click', ()=>{ loadLatest(); });
 rb.addEventListener('click', ()=>{ rollback(); });
 
-// Auto-check on load (manual mode preferred: only check at start)
 window.addEventListener('load', ()=>{
   setStatus('inicjalizacja...');
-  // small delay to let UI show
-  setTimeout(()=>{
-    loadLatest();
-  }, 300);
+  setTimeout(()=>{ loadLatest(); }, 300);
 });
 </script>
 </body>
