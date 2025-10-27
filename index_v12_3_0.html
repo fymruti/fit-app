@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Fit – All-in-One (v12.3.0)</title>
+<meta name="app-version" content="12.3.0"/>
+<style>
+:root{
+  --bg:#f2f2f2; --ink:#0f172a; --ink-soft:#475569;
+  --accent:#4A90E2; --accent-dark:#357ABD;
+  --card:#e0e0e0; --input:#fafafa; --border:#cbd5e1;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0f172a; --ink:#f1f5f9; --ink-soft:#94a3b8;
+    --accent:#60a5fa; --accent-dark:#2563eb;
+    --card:#1f2937; --input:#1e293b; --border:#334155;
+  }
+}
+body.dark{
+  --bg:#0f172a; --ink:#f1f5f9; --ink-soft:#94a3b8;
+  --accent:#60a5fa; --accent-dark:#2563eb;
+  --card:#1f2937; --input:#1e293b; --border:#334155;
+}
+*{box-sizing:border-box}
+body{ margin:0; font-family:Inter,system-ui,Segoe UI,Roboto,Arial; background:var(--bg); color:var(--ink); transition:background .3s,color .3s;}
+header{ display:grid; grid-template-columns:1fr auto; gap:10px;
+  background:linear-gradient(90deg,var(--accent),var(--accent-dark)); color:#fff; padding:10px; position:sticky; top:0; z-index:10; box-shadow:0 3px 6px rgba(0,0,0,.1);}
+.tabs{display:flex; gap:8px; flex-wrap:wrap}
+.tabs a{ padding:8px 12px; border:none; border-radius:8px; cursor:pointer; background:#fff; color:#1b3f6b; font-weight:600; box-shadow:0 2px 4px rgba(0,0,0,.15); text-decoration:none}
+body.dark .tabs a{background:#1e293b; color:#e2e8f0}
+.tabs a[aria-current="page"]{background:#1b3f6b; color:#fff}
+body.dark .tabs a[aria-current="page"]{background:#60a5fa; color:#0f172a}
+.rightbar{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+.rightbar button{ border:none; border-radius:8px; padding:6px 8px; cursor:pointer; background:#fff; color:#1b3f6b;}
+body.dark .rightbar button{background:#334155; color:#f1f5f9}
+.btn{background:#fff; color:#1b3f6b; border:1px solid rgba(255,255,255,.4); border-radius:8px; padding:6px 10px; cursor:pointer}
+main{max-width:1180px; margin:0 auto; padding:12px}
+.card{ background:var(--card); border-radius:12px; padding:12px; box-shadow:0 6px 14px rgba(0,0,0,.08); margin-bottom:12px;}
+.small{font-size:12px; color:var(--ink-soft)}
+label{display:block; margin-top:8px; font-weight:700; font-size:13px}
+input,select,textarea{ width:100%; margin-top:5px; padding:8px; font-size:13px; border:1px solid var(--border); border-radius:10px; background:var(--input); color:var(--ink);}
+.row-2{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+.row-3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px}
+main > section{display:none}
+main > section#start{display:block}
+main > section:target{display:block}
+main:has(section:target:not(#start)) > #start{display:none}
+
+/* Sylwetka */
+.syl-grid{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; align-items:start;}
+@media (max-width:1100px){ .syl-grid{ grid-template-columns:1fr; } }
+.figure-wrap{position:relative; width:100%; max-width:360px; margin:0 auto;}
+.figure-wrap img{width:100%; height:auto; display:block; border-radius:10px; border:1px solid var(--border); background:#000;}
+.kpi{display:flex; gap:8px; flex-wrap:wrap}
+.kpi .pill{background:#fff; color:#1b3f6b; border:1px solid var(--border); border-radius:999px; padding:4px 8px; font-size:12px}
+body.dark .kpi .pill{background:#1e293b; color:#e2e8f0; border-color:#334155}
+canvas{width:100%; height:160px; display:block; background:#fff; border-radius:10px; border:1px solid var(--border)}
+body.dark canvas{background:#0b1220; border-color:#334155}
+.gallery{display:flex; gap:6px; flex-wrap:wrap; margin-top:6px}
+.gallery .thumb{position:relative}
+.gallery img{width:70px; height:90px; object-fit:cover; border:1px solid var(--border); border-radius:6px; cursor:pointer; background:#000}
+.gallery .del{position:absolute; top:-6px; right:-6px; width:20px; height:20px; border-radius:50%; border:none; background:#ef4444; color:#fff; font-weight:700; cursor:pointer}
+
+/* HUD */
+#hud{position:fixed;left:8px;bottom:8px;max-width:70vw;background:rgba(0,0,0,.65);color:#fff;border-radius:8px;padding:6px 10px;font:12px system-ui;z-index:9999;display:none}
+</style>
+</head>
+<body>
+<header>
+  <nav class="tabs" id="tabs">
+    <a href="#start" data-tab="start" aria-current="page">Start</a>
+    <a href="#sylwetka" data-tab="sylwetka">Sylwetka</a>
+    <a href="#dieta" data-tab="dieta">Dieta</a>
+    <a href="#jedzenie" data-tab="jedzenie">Jedzenie</a>
+    <a href="#suple" data-tab="suple">Suple</a>
+  </nav>
+  <div class="rightbar">
+    <button id="btnTheme" class="btn" title="Tryb jasny/ciemny">🌙/☀️</button>
+    <button id="btnPickDir" class="btn" title="Wybierz folder FIT (Chromium)">📁 Ustaw folder FIT</button>
+    <button id="btnSaveReport" class="btn" title="Zapisz raport TXT">📝 Zapisz raport TXT</button>
+    <button id="btnDiag" class="btn" title="Panel diagnostyczny">🧪Diag</button>
+  </div>
+</header>
+
+<main>
+  <section id="start">
+    <div class="card">
+      <h3>Start</h3>
+      <div class="small">
+        v12.3.0 — przywrócona karta „Sylwetka”: pomiary, BMI, wykres, zdjęcia (max 5/dzień), podgląd, kasowanie.
+      </div>
+    </div>
+  </section>
+
+  <section id="sylwetka">
+    <div class="syl-grid">
+      <!-- 1) Zdjęcie poglądowe + upload + galeria -->
+      <div class="card">
+        <h3>🧍 Wizualizacja + zdjęcia</h3>
+        <div class="figure-wrap">
+          <!-- stałe osadzone zdjęcie poglądowe -->
+          <img src="https://raw.githubusercontent.com/fymruti/fit-app/main/bodybuilder-146791_1280.webp" alt="Sylwetka poglądowa" />
+        </div>
+        <div class="row-2" style="margin-top:8px">
+          <div>
+            <label>Data zdjęcia</label>
+            <input type="date" id="photoDate">
+          </div>
+          <div>
+            <label>Dodaj zdjęcia (JPG/PNG, max 5/dzień)</label>
+            <input type="file" id="photoFiles" accept="image/*" multiple>
+          </div>
+        </div>
+        <div class="small">Limit: maksymalnie 5 zdjęć na jedną datę. Klik na miniaturę – podgląd. 🔴 przycisk usuwa zdjęcie.</div>
+        <div class="gallery" id="photoGallery"></div>
+      </div>
+
+      <!-- 2) Pomiary + BMI -->
+      <div class="card">
+        <h3>📏 Pomiary + BMI</h3>
+        <div class="row-3">
+          <div><label>Data</label><input type="date" id="mDate"></div>
+          <div><label>Wzrost [cm]</label><input type="number" id="mHeight" step="0.1"></div>
+          <div><label>Waga [kg]</label><input type="number" id="mWeight" step="0.1"></div>
+        </div>
+        <div class="row-3">
+          <div><label>Klatka [cm]</label><input type="number" id="mChest" step="0.1"></div>
+          <div><label>Biceps [cm]</label><input type="number" id="mBiceps" step="0.1"></div>
+          <div><label>Brzuch [cm]</label><input type="number" id="mBelly" step="0.1"></div>
+        </div>
+        <div class="row-3">
+          <div><label>Pas [cm]</label><input type="number" id="mWaist" step="0.1"></div>
+          <div><label>Udo [cm]</label><input type="number" id="mThigh" step="0.1"></div>
+          <div><label>Łydka [cm]</label><input type="number" id="mCalf" step="0.1"></div>
+        </div>
+        <div class="row-2" style="margin-top:8px">
+          <button id="btnSaveMeasurement" class="btn">💾 Zapisz pomiar</button>
+          <button id="btnClearMeasurement" class="btn">🧹 Wyczyść</button>
+        </div>
+        <div class="kpi" style="margin-top:8px">
+          <div class="pill">BMI: <b id="outBMI">–</b></div>
+          <div class="pill">Ostatni: <span id="outLastDate">–</span></div>
+          <div class="pill">Waga: <span id="outLastWeight">–</span> kg</div>
+        </div>
+      </div>
+
+      <!-- 3) Wykres + historia -->
+      <div class="card">
+        <h3>📉 Wykres + Historia</h3>
+        <canvas id="mChart" width="340" height="160"></canvas>
+        <div id="mHistory" class="small">Brak danych.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="dieta"><div class="card"><h3>Dieta</h3><div class="small">Przywrócimy w kolejnym kroku.</div></div></section>
+  <section id="jedzenie"><div class="card"><h3>Jedzenie</h3><div class="small">Przywrócimy w kolejnym kroku.</div></div></section>
+  <section id="suple"><div class="card"><h3>Suple</h3><div class="small">Przywrócimy w kolejnym kroku.</div></div></section>
+</main>
+
+<div id="hud"></div>
+
+<script>
+/* === Stabilny rdzeń (HUD, log, tabs, dark, raport TXT) === */
+(function(){
+  function hud(msg){const d=document.getElementById('hud');d.textContent=msg;d.style.display='block';clearTimeout(d._t);d._t=setTimeout(()=>d.style.display='none',4000);}
+  function log(level,msg,meta){console[level]('[FIT]',msg,meta||'');hud(msg);}
+  function now(){return new Date().toISOString().slice(0,19).replace('T',' ');}
+
+  // hash -> podświetlenie
+  function paintTabs(){const id=(location.hash||'#start').slice(1);document.querySelectorAll('#tabs a').forEach(a=>a.setAttribute('aria-current',a.dataset.tab===id?'page':'false'));}
+  if(!location.hash){ location.replace('#start'); }
+  addEventListener('hashchange',paintTabs); paintTabs();
+
+  // dark mode
+  const KEY='fit_theme_v1', btn=document.getElementById('btnTheme');
+  const pref = localStorage.getItem(KEY);
+  if(pref==='dark') document.body.classList.add('dark');
+  if(pref==='light') document.body.classList.remove('dark');
+  btn.addEventListener('click',()=>{ const dark=!document.body.classList.contains('dark'); document.body.classList.toggle('dark',dark); localStorage.setItem(KEY,dark?'dark':'light'); hud(dark?'🌙 Tryb ciemny':'☀️ Tryb jasny'); });
+
+  // raport TXT
+  let dirHandle=null;
+  document.getElementById('btnPickDir').addEventListener('click',async()=>{
+    try{
+      if(!window.showDirectoryPicker){ alert('Twoja przeglądarka nie obsługuje wyboru folderu. Użyj Chrome/Edge, albo zapisz TXT jako pobranie.'); return; }
+      dirHandle = await window.showDirectoryPicker({mode:'readwrite'});
+      hud('📁 Folder FIT ustawiony');
+    }catch(e){ log('warn','Anulowano wybór folderu',e); }
+  });
+  document.getElementById('btnSaveReport').addEventListener('click',async()=>{
+    try{
+      const ver=document.querySelector('meta[name=app-version]')?.content||'?';
+      const text = `FIT Raport\nData: ${now()}\nWersja: v${ver}\nPrzeglądarka: ${navigator.userAgent}\nZakładka: ${(location.hash||'#start')}\nMotyw: ${document.body.classList.contains('dark')?'dark':'light'}`;
+      const fname = `FIT_report_v${ver}_${Date.now()}.txt`;
+      if(dirHandle){
+        try{
+          const f = await dirHandle.getFileHandle(fname,{create:true});
+          const w = await f.createWritable(); await w.write(text); await w.close();
+          hud('💾 Zapisano: '+fname); return;
+        }catch(e){ log('warn','Zapis do folderu nieudany, pobieram',e); }
+      }
+      const blob = new Blob([text],{type:'text/plain;charset=utf-8'});
+      const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=fname; a.click();
+      hud('⬇️ Pobrano: '+fname);
+    }catch(e){ log('error','Błąd zapisu raportu',e); }
+  });
+
+  document.getElementById('btnDiag').addEventListener('click',()=>{
+    alert('Diag: FIT działa poprawnie. Jeśli coś nie gra – zapisz raport TXT i wyślij mi treść.');
+  });
+
+  log('info','FIT v12.3.0 start');
+})();
+
+/* === Sylwetka: dane, wykres, zdjęcia (limit 5/dzień) === */
+(function(){
+  const KEY='fit_sylwetka_v1';
+  const qs=s=>document.querySelector(s);
+
+  function load(){ try{ return JSON.parse(localStorage.getItem(KEY)||'{}'); }catch(_){ return {}; } }
+  function save(o){ localStorage.setItem(KEY, JSON.stringify(o)); }
+
+  function today(){ return new Date().toISOString().slice(0,10); }
+  function calcBMI(h,w){ if(!h||!w) return '–'; return (w/((h/100)**2)).toFixed(1); }
+
+  // === POMIARY ===
+  function readForm(){
+    return {
+      date: qs('#mDate').value || today(),
+      height: +qs('#mHeight').value || null,
+      weight: +qs('#mWeight').value || null,
+      chest: +qs('#mChest').value || null,
+      biceps: +qs('#mBiceps').value || null,
+      belly: +qs('#mBelly').value || null,
+      waist: +qs('#mWaist').value || null,
+      thigh: +qs('#mThigh').value || null,
+      calf: +qs('#mCalf').value || null,
+    };
+  }
+  function renderSummary(db){
+    const last = (db.measurements||[]).slice(-1)[0];
+    qs('#outLastDate').textContent = last? last.date : '–';
+    qs('#outLastWeight').textContent = (last && last.weight!=null)? last.weight : '–';
+    qs('#outBMI').textContent = last? calcBMI(last.height,last.weight) : '–';
+  }
+  function renderHistory(db){
+    const box = qs('#mHistory'); const list=(db.measurements||[]).slice(-5);
+    if(!list.length){ box.textContent='Brak danych.'; return; }
+    const v=x=> (x==null||x==='')?'–':x;
+    let html='<table style="width:100%;border-collapse:collapse;font-size:12px">';
+    html+='<thead><tr><th style="text-align:left;border-bottom:1px solid var(--border);padding:4px">Data</th>';
+    ['Waga','Pas','Klatka','Biceps'].forEach(h=>html+=`<th style="text-align:right;border-bottom:1px solid var(--border);padding:4px">${h}</th>`); html+='</tr></thead><tbody>';
+    list.forEach(r=>{
+      html+=`<tr>
+        <td style="padding:4px;border-bottom:1px solid var(--border)">${r.date}</td>
+        <td style="padding:4px;border-bottom:1px solid var(--border);text-align:right">${v(r.weight)}</td>
+        <td style="padding:4px;border-bottom:1px solid var(--border);text-align:right">${v(r.waist)}</td>
+        <td style="padding:4px;border-bottom:1px solid var(--border);text-align:right">${v(r.chest)}</td>
+        <td style="padding:4px;border-bottom:1px solid var(--border);text-align:right">${v(r.biceps)}</td>
+      </tr>`;
+    });
+    html+='</tbody></table>'; box.innerHTML=html;
+  }
+  function renderChart(db){
+    const c=qs('#mChart'), ctx=c.getContext('2d'); ctx.clearRect(0,0,c.width,c.height);
+    const data=db.measurements||[]; if(!data.length){ ctx.fillStyle='#64748b'; ctx.fillText('Brak danych',10,18); return; }
+    const series=[ {k:'weight',l:'Waga'}, {k:'waist',l:'Pas'}, {k:'chest',l:'Klatka'}, {k:'biceps',l:'Biceps'} ];
+    const dates=data.map(d=>d.date), X=dates.map(d=>new Date(d).getTime()); const xMin=Math.min(...X), xMax=Math.max(...X);
+    const vals=[]; data.forEach(d=>series.forEach(s=>{ const v=d[s.k]; if(v!=null) vals.push(+v); })); const yMin=Math.min(...vals), yMax=Math.max(...vals);
+    const pad=26, top=14, right=8, bottom=20, W=c.width-pad-right, H=c.height-top-bottom;
+    const cols=['#2563eb','#16a34a','#d97706','#db2777'];
+    ctx.strokeStyle='#e5e7eb'; ctx.fillStyle='#64748b'; for(let i=0;i<=4;i++){ const t=i/4, y=top+H-t*H; ctx.beginPath(); ctx.moveTo(pad,y); ctx.lineTo(pad+W,y); ctx.stroke(); ctx.fillText((yMin+t*(yMax-yMin)).toFixed(0),4,y+3);}
+    ctx.fillText(dates[0], pad, c.height-4); if(dates.length>1) ctx.fillText(dates.at(-1), pad+W-70, c.height-4);
+    series.forEach((s,i)=>{ ctx.strokeStyle=cols[i%cols.length]; ctx.lineWidth=2; ctx.beginPath(); let started=false;
+      data.forEach((r,idx)=>{ const yv=r[s.k]; if(yv==null) return; const x=pad+((X[idx]-xMin)/(xMax-xMin||1))*W; const y=top+(1-((yv-yMin)/(yMax-yMin||1)))*H; if(!started){ctx.moveTo(x,y); started=true;} else ctx.lineTo(x,y);}); ctx.stroke();
+      ctx.fillStyle=cols[i%cols.length]; data.forEach((r,idx)=>{ const yv=r[s.k]; if(yv==null) return; const x=pad+((X[idx]-xMin)/(xMax-xMin||1))*W; const y=top+(1-((yv-yMin)/(yMax-yMin||1)))*H; ctx.beginPath(); ctx.arc(x,y,2.6,0,Math.PI*2); ctx.fill();});
+    });
+  }
+
+  // === ZDJĘCIA z limitem 5/dzień ===
+  function renderGallery(db){
+    const box=qs('#photoGallery'); box.innerHTML='';
+    const list=(db.photos||[]).slice().sort((a,b)=>a.ts-b.ts).slice(-20); // ostatnie 20
+    if(!list.length){ box.innerHTML='<span class="small">Brak zdjęć.</span>'; return; }
+    list.forEach((p,idx)=>{
+      const wrap=document.createElement('div'); wrap.className='thumb';
+      const img=document.createElement('img'); img.src=p.data; img.title=p.date; img.alt='zdjęcie sylwetki';
+      img.addEventListener('click',()=>window.open(p.data,'_blank'));
+      const del=document.createElement('button'); del.className='del'; del.textContent='×';
+      del.addEventListener('click',()=>{ const db2=load(); db2.photos = (db2.photos||[]).filter(x=>x.ts!==p.ts); save(db2); renderGallery(db2); });
+      wrap.appendChild(img); wrap.appendChild(del); box.appendChild(wrap);
+    });
+  }
+
+  // === INIT/BIND ===
+  function bind(){
+    const db=load();
+    qs('#mDate').value = today();
+    qs('#photoDate').value = today();
+
+    // zapisz pomiar
+    qs('#btnSaveMeasurement').addEventListener('click',()=>{
+      const rec=readForm(); const db=load();
+      db.measurements = db.measurements||[];
+      db.measurements = db.measurements.filter(x=>x.date!==rec.date); db.measurements.push(rec);
+      db.measurements.sort((a,b)=>a.date.localeCompare(b.date));
+      save(db);
+      renderSummary(db); renderHistory(db); renderChart(db);
+      alert('✅ Zapisano: '+rec.date);
+    });
+    // czyść pola
+    qs('#btnClearMeasurement').addEventListener('click',()=>{
+      ['#mHeight','#mWeight','#mChest','#mBiceps','#mBelly','#mWaist','#mThigh','#mCalf'].forEach(s=>qs(s).value='');
+    });
+
+    // zdjęcia (multi) + limit 5/dzień
+    qs('#photoFiles').addEventListener('change',e=>{
+      const files=[...(e.target.files||[])]; if(!files.length) return;
+      const selDate = qs('#photoDate').value || today();
+      const frs = files.slice(0,10); // safety
+      const db=load(); db.photos = db.photos||[];
+      const existingCount = db.photos.filter(p=>p.date===selDate).length;
+      const canAdd = Math.max(0, 5 - existingCount);
+      if(canAdd<=0){ alert('Limit 5 zdjęć na ten dzień już wykorzystany.'); e.target.value=''; return; }
+      const take = frs.slice(0, canAdd);
+      let pending = take.length;
+      take.forEach(file=>{
+        const fr=new FileReader();
+        fr.onload=()=>{ const obj={date:selDate, ts:Date.now()+Math.random(), data:fr.result}; db.photos.push(obj); pending--; if(pending===0){ save(db); renderGallery(db); alert('✅ Dodano: '+take.length+' zdj. ('+selDate+')'); e.target.value=''; } };
+        fr.readAsDataURL(file);
+      });
+    });
+
+    // render
+    renderSummary(db); renderHistory(db); renderChart(db); renderGallery(db);
+  }
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',bind,{once:true}); else bind();
+})();
+</script>
+</body>
+</html>
