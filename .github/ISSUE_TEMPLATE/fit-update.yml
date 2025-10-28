@@ -1,0 +1,27 @@
+name: "FIT Update"
+description: "Wgraj/zmień plik w repo"
+title: "[FIT-UPDATE] Podmiana pliku"
+labels: ["fit-update"]
+body:
+  - type: input
+    id: path
+    attributes:
+      label: Ścieżka pliku w repo (np. index.html)
+      placeholder: index.html
+    validations:
+      required: true
+  - type: textarea
+    id: message
+    attributes:
+      label: Opis commita
+      placeholder: feat: update index.html
+    validations:
+      required: true
+  - type: textarea
+    id: content
+    attributes:
+      label: Treść pliku (wklej TU)
+      description: "Wklej cały kod pliku. Nic więcej."
+      render: shell
+    validations:
+      required: true
