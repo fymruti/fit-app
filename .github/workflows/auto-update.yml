@@ -1,0 +1,59 @@
+name: Auto Update (FIT)
+
+on:
+  repository_dispatch:
+    types: [fit-update]
+  workflow_dispatch:
+    inputs:
+      repo_path:
+        description: "Ścieżka pliku w repo (np. index.html)"
+        required: true
+      base64_content:
+        description: "Treść pliku w Base64"
+        required: true
+      commit_message:
+        description: "Opis commita"
+        required: true
+        default: "feat: update via workflow_dispatch"
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Inputs
+        id: in
+        run: |
+          if [[ "${{ github.event_name }}" == "repository_dispatch" ]]; then
+            echo "repo_path=${{ github.event.client_payload.repo_path }}" >> $GITHUB_OUTPUT
+            echo "base64_content=${{ github.event.client_payload.base64_content }}" >> $GITHUB_OUTPUT
+            echo "commit_message=${{ github.event.client_payload.commit_message }}" >> $GITHUB_OUTPUT
+            echo "branch=${{ github.event.client_payload.branch || 'main' }}" >> $GITHUB_OUTPUT
+          else
+            echo "repo_path=${{ github.event.inputs.repo_path }}" >> $GITHUB_OUTPUT
+            echo "base64_content=${{ github.event.inputs.base64_content }}" >> $GITHUB_OUTPUT
+            echo "commit_message=${{ github.event.inputs.commit_message }}" >> $GITHUB_OUTPUT
+            echo "branch=main" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Ensure dir
+        run: mkdir -p "$(dirname '${{ steps.in.outputs.repo_path }}')"
+
+      - name: Write file from Base64
+        run: echo "${{ steps.in.outputs.base64_content }}" | base64 -d > "${{ steps.in.outputs.repo_path }}"
+
+      - name: Commit & push
+        env:
+          BRANCH: ${{ steps.in.outputs.branch }}
+          MSG: ${{ steps.in.outputs.commit_message }}
+        run: |
+          git config user.name  "fit-bot"
+          git config user.email "fit-bot@users.noreply.github.com"
+          git add "${{ steps.in.outputs.repo_path }}"
+          git commit -m "$MSG" || echo "No changes"
+          git push origin "$BRANCH"
