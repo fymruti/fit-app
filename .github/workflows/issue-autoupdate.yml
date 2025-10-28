@@ -1,0 +1,82 @@
+name: FIT Auto Update via Issue
+
+on:
+  issues:
+    types: [opened, edited]
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  run:
+    if: contains(github.event.issue.labels.*.name, 'fit-update')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Parse issue body
+        id: parse
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = context.payload.issue.body || '';
+            // Prosty parser pól z szablonu
+            const path = body.match(/### Ścieżka pliku[^]*?\n\n([^\n]+)/)?.[1]?.trim();
+            const msg  = body.match(/### Opis commita[^]*?\n\n([^\n]+)/)?.[1]?.trim();
+            const code = body.match(/### Treść pliku[^]*?```[\s\S]*?```/);
+            let content = null;
+            if (code) {
+              content = code[0].replace(/^.*?```[a-zA-Z]*\n/s,'').replace(/\n```$/,'');
+            } else {
+              // fallback: cały blok po polu Treść pliku
+              content = body.split('### Treść pliku')[1]?.trim() || '';
+            }
+            if (!path || !msg || !content) {
+              core.setFailed('Brak wymaganych pól (ścieżka, opis, treść).');
+            }
+            core.setOutput('path', path);
+            core.setOutput('msg', msg);
+            // Zapisz kod do pliku tymczasowego
+            const fs = require('fs');
+            fs.mkdirSync('tmp', { recursive: true });
+            fs.writeFileSync('tmp/upload.txt', content, 'utf8');
+
+      - name: Ensure directory
+        run: mkdir -p "$(dirname '${{ steps.parse.outputs.path }}')"
+
+      - name: Move content into place
+        run: mv tmp/upload.txt "${{ steps.parse.outputs.path }}"
+
+      - name: Commit & push
+        env:
+          MSG: ${{ steps.parse.outputs.msg }}
+        run: |
+          git config user.name  "fit-bot"
+          git config user.email "fit-bot@users.noreply.github.com"
+          git add "${{ steps.parse.outputs.path }}"
+          git commit -m "$MSG" || echo "No changes"
+          git push
+
+      - name: Comment with preview link
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const path = '${{ steps.parse.outputs.path }}';
+            const url = `https://fymruti.github.io/fit-app/${path}`;
+            const msg = `✅ Wgrano: \`${path}\`\nPodgląd: ${url}\n\nAby ponowić – edytuj to Issue i zaktualizuj treść.`;
+            await github.rest.issues.createComment({
+              ...context.repo,
+              issue_number: context.issue.number,
+              body: msg
+            });
+
+      - name: Auto-close issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.update({
+              ...context.repo,
+              issue_number: context.issue.number,
+              state: 'closed'
+            });
