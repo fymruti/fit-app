@@ -1,21 +1,55 @@
 <!DOCTYPE html>
-<html lang='pl'><head><meta charset='utf-8'/><meta name='viewport' content='width=device-width,initial-scale=1'/>
+<html lang="pl">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>FIT – v12.9.0</title>
 <style>
-:root{--bg:#f2f5f9;--ink:#0f172a;--ink-soft:#475569;--accent:#3b82f6;--card:#fff;--input:#f8fafc;--border:#cbd5e1}
-body.dark{--bg:#0b1220;--ink:#e5edf6;--ink-soft:#9fb0c9;--accent:#60a5fa;--card:#121a2b;--input:#0f172a;--border:#334155}
-*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--ink)}
-header{position:sticky;top:0;z-index:10;padding:10px;background:linear-gradient(90deg,var(--accent),#8b5cf6);color:#fff}
-.tabs{display:flex;gap:8px;flex-wrap:wrap}.tabs button{padding:8px 12px;border:none;border-radius:10px;cursor:pointer;background:#fff}
-body.dark .tabs button{background:#1e293b;color:#e2e8f0}.tabs button.active{background:#0f172a;color:#fff}
-main{max-width:1200px;margin:0 auto;padding:12px}.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px;margin:10px 0}
-.hidden{display:none}.row-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
-.figure-wrap img{width:100%;border-radius:12px;border:1px solid var(--border);background:#000}.gallery{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+:root{
+  --bg:#f2f5f9; --ink:#0f172a; --ink-soft:#475569;
+  --accent:#3b82f6; --accent2:#8b5cf6;
+  --card:#ffffff; --input:#f8fafc; --border:#cbd5e1;
+}
+body.dark{
+  --bg:#0b1220; --ink:#e5edf6; --ink-soft:#9fb0c9;
+  --accent:#60a5fa; --accent2:#7c3aed;
+  --card:#121a2b; --input:#0f172a; --border:#334155;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--ink);}
+header{position:sticky;top:0;z-index:10;padding:10px;background:linear-gradient(90deg,var(--accent),var(--accent2));color:#fff}
+.tabs{display:flex;gap:8px;flex-wrap:wrap}
+.tabs button{padding:8px 12px;border:none;border-radius:10px;cursor:pointer;background:#fff;color:#0f172a;font-weight:600}
+body.dark .tabs button{background:#1e293b;color:#e2e8f0}
+.tabs button.active{background:#0f172a;color:#fff}
+.rightbar{display:flex;gap:8px;align-items:center;margin-top:8px}
+.rightbar button{border:none;border-radius:10px;padding:8px 10px;cursor:pointer}
+main{max-width:1200px;margin:0 auto;padding:12px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px;margin:10px 0}
+.hidden{display:none}
+.row-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+label{display:block;margin-top:6px;font-weight:700;font-size:13px}
+input,select,textarea{width:100%;margin-top:4px;padding:8px;border:1px solid var(--border);border-radius:10px;background:var(--input);color:var(--ink)}
+select option{color:#0f172a}
+body.dark select option{color:#e2e8f0}
+.kpi{display:flex;gap:8px;flex-wrap:wrap}
+.kpi .pill{background:#fff;color:#0f172a;border:1px solid var(--border);border-radius:999px;padding:4px 8px;font-size:12px}
+body.dark .kpi .pill{background:#1e293b;color:#e2e8f0;border-color:#334155}
+.figure-wrap img{width:100%;border-radius:12px;border:1px solid var(--border);background:#000}
+.gallery{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
 .gallery img{width:78px;height:96px;object-fit:cover;border:1px solid var(--border);border-radius:8px;cursor:pointer;background:#000}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;padding:20px;z-index:50}
-.modal .box{background:#000;border-radius:12px;max-width:1280px;width:100%;padding:10px;position:relative}.modal img{width:100%;height:auto}
-.modal .close{position:absolute;top:8px;right:8px;background:#fff;border:none;border-radius:8px;padding:6px 10px;cursor:pointer}
+.legend{font-size:12px;color:var(--ink-soft)}
 canvas{width:100%;height:180px;display:block;background:#fff;border-radius:10px;border:1px solid var(--border)}
+body.dark canvas{background:#0b1220}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;padding:20px;z-index:50}
+.modal .box{background:#000;border-radius:12px;max-width:1280px;width:100%;padding:10px;position:relative}
+.modal img{width:100%;height:auto}
+.modal .close{position:absolute;top:8px;right:8px;background:#fff;border:none;border-radius:8px;padding:6px 10px;cursor:pointer}
+.pins{position:relative}
+.pin{position:absolute;width:14px;height:14px;border-radius:50%;background:#60a5fa;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+.pin::after{content:attr(data-label);position:absolute;left:18px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.92);color:#0b1220;padding:2px 6px;border-radius:6px;font-size:11px;white-space:nowrap}
+body.dark .pin::after{background:rgba(15,23,42,.92);color:#e2e8f0}
 </style>
 </head>
 <body>
@@ -29,54 +63,255 @@ canvas{width:100%;height:180px;display:block;background:#fff;border-radius:10px;
     <button data-tab="suple">Suple</button>
     <button data-tab="opcje">Opcje</button>
   </div>
-  <button id="btnTheme" style="margin-top:8px">🌙/☀️</button>
+  <div class="rightbar">
+    <button id="btnTheme">🌙/☀️</button>
+  </div>
 </header>
 <main>
-<section id="start">
-  <div class="card"><h2>FIT v12.9.0</h2><div>Ta wersja zawiera: sylwetkę z auto-blur, kolumny diety, listę zakupów, treningi z linkami YT, suple „będą potem”, opcje z folderem raportów.</div></div>
-</section>
-<section id="sylwetka" class="hidden">
-  <div class="card"><h3>🧍 Dawid + zdjęcia</h3>
-    <div class="figure-wrap"><img id="dawidImg" alt="Dawid" src="data:image/svg+xml;utf8,<?xml version='1.0'?><svg xmlns='http://www.w3.org/2000/svg' width='640' height='960'><rect width='100%' height='100%' fill='black'/><text x='50%' y='50%' fill='white' font-size='32' text-anchor='middle'>Dawid</text></svg>"/></div>
-    <div class="row-2" style="margin-top:8px">
-      <div><label>Data</label><input type="date" id="photoDate"></div>
-      <div><label>Dodaj zdjęcia (max 5/dzień)</label><input type="file" id="photoFile" accept="image/*" multiple></div>
+  <!-- START -->
+  <section id="start">
+    <div class="card">
+      <h2>FIT v12.9.0</h2>
+      <div class="kpi">
+        <div class="pill">Tryb: <b id="modeInfo">light</b></div>
+        <div class="pill">Data: <b id="dateInfo">—</b></div>
+      </div>
+      <p class="legend">Ta wersja zawiera: wielozdjęciową galerię (max 5/dzień) z auto-blurem twarzy, podgląd 720p w oknie, kolumny posiłków, listę zakupów, treningi z YT, „Suple potem”, oraz zakładkę Opcje.</p>
     </div>
-    <div class="gallery" id="photoGallery"></div>
-  </div>
-  <div class="card"><h3>📉 Wykres</h3><canvas id="mChart" width="360" height="180"></canvas></div>
-</section>
-<section id="dieta" class="hidden"><div class="card"><h3>🍽️ Posiłki (3 kolumny)</h3><div id="mealsGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px"></div></div></section>
-<section id="jedzenie" class="hidden"><div class="card"><h3>🛒 Lista zakupów</h3><textarea id="shoppingList" rows="6" style="width:100%"></textarea><button id="btnDownloadReport">⬇️ TXT</button></div></section>
-<section id="trening" class="hidden"><div class="card"><h3>🏋️‍♂️ Dzisiejszy trening</h3><div id="workoutToday">Wybierz plan.</div></div></section>
-<section id="suple" class="hidden"><div class="card" style="text-align:center;padding:40px"><h2>💊 Suplementy</h2><p>Moduł będzie dodany później.</p></div></section>
-<section id="opcje" class="hidden"><div class="card"><h3>⚙️ Opcje</h3><input id="reportFolder" placeholder="C:\\FIT\\Reports\\"><button id="btnSaveFolder">💾 Zapisz</button><div id="folderInfo" style="font-size:12px;color:#475569;margin-top:6px"></div></div></section>
+  </section>
+
+  <!-- SYLWETKA -->
+  <section id="sylwetka" class="hidden">
+    <div class="card">
+      <h3>🧍 Dawid (wbudowany) + Twoje zdjęcia</h3>
+      <div class="figure-wrap pins">
+        <img id="dawidImg" alt="Dawid"
+          src="data:image/svg+xml;utf8,<?xml version='1.0'?><svg xmlns='http://www.w3.org/2000/svg' width='640' height='960'><rect width='100%' height='100%' fill='black'/><text x='50%' y='50%' fill='white' font-size='32' text-anchor='middle'>Dawid – podgląd</text></svg>" />
+        <span class="pin" style="left:56%; top:29%" data-label="Klatka"></span>
+        <span class="pin" style="left:18%; top:20%" data-label="Biceps"></span>
+        <span class="pin" style="left:55%; top:42%" data-label="Brzuch"></span>
+        <span class="pin" style="left:55%; top:49.5%" data-label="Pas"></span>
+        <span class="pin" style="left:53%; top:68%" data-label="Udo"></span>
+        <span class="pin" style="left:52%; top:86%" data-label="Łydka"></span>
+      </div>
+      <div class="legend" style="margin-top:6px">Legenda wykresu: <span style="color:#2563eb">Waga</span> • <span style="color:#16a34a">Pas</span> • <span style="color:#d97706">Klatka</span> • <span style="color:#db2777">Biceps</span></div>
+
+      <div class="row-2" style="margin-top:8px">
+        <div><label>Data zdjęcia</label><input type="date" id="photoDate"></div>
+        <div><label>Dodaj zdjęcia (max 5/dzień)</label><input type="file" id="photoFile" accept="image/*" multiple></div>
+      </div>
+      <div class="gallery" id="photoGallery"></div>
+    </div>
+
+    <div class="card">
+      <h3>📉 Wykres (demo)</h3>
+      <canvas id="mChart" width="360" height="180"></canvas>
+    </div>
+  </section>
+
+  <!-- DIETA -->
+  <section id="dieta" class="hidden">
+    <div class="row-3">
+      <div class="card">
+        <h3>🍽️ Śniadanie</h3>
+        <div id="bMeals"></div>
+      </div>
+      <div class="card">
+        <h3>🍛 Obiad</h3>
+        <div id="lMeals"></div>
+      </div>
+      <div class="card">
+        <h3>🥗 Kolacja</h3>
+        <div id="dMeals"></div>
+      </div>
+    </div>
+    <div class="row-2">
+      <div class="card">
+        <h3>📝 Uwagi</h3>
+        <textarea id="dietNotes" rows="5" placeholder="np. bez laktozy, mniej glutenu..."></textarea>
+      </div>
+      <div class="card">
+        <h3>🍴 Moje dania (stałe)</h3>
+        <textarea id="myMeals" rows="5" placeholder="- Jajecznica PRO P35/C10/F20..."></textarea>
+      </div>
+    </div>
+  </section>
+
+  <!-- JEDZENIE -->
+  <section id="jedzenie" class="hidden">
+    <div class="card">
+      <h3>🛒 Lista zakupów</h3>
+      <textarea id="shoppingList" rows="6" placeholder="- ryż 2 kg&#10;- pierś z kurczaka 2 kg..."></textarea>
+      <div style="margin-top:8px"><button id="btnDownloadReport">⬇️ Zapisz TXT</button></div>
+    </div>
+  </section>
+
+  <!-- TRENING -->
+  <section id="trening" class="hidden">
+    <div class="card">
+      <h3>🏋️‍♂️ Dzisiejszy trening</h3>
+      <div id="workoutToday" class="legend">Wybierz plan. Linki YT pojawią się tutaj (demo).</div>
+    </div>
+  </section>
+
+  <!-- SUPLE -->
+  <section id="suple" class="hidden">
+    <div class="card" style="text-align:center;padding:40px">
+      <h2>💊 Suplementy</h2>
+      <p>Moduł będzie dodany później.</p>
+    </div>
+  </section>
+
+  <!-- OPCJE -->
+  <section id="opcje" class="hidden">
+    <div class="card">
+      <h3>⚙️ Opcje</h3>
+      <label>Folder raportów (lokalnie)</label>
+      <input id="reportFolder" placeholder="C:\FIT\Reports\">
+      <button id="btnSaveFolder">💾 Zapisz</button>
+      <div id="folderInfo" class="legend" style="margin-top:6px"></div>
+    </div>
+  </section>
 </main>
-<div class="modal" id="photoModal"><div class="box"><button class="close" id="closeModal">Zamknij ✖</button><img id="modalImg" alt="Podgląd 720p"/></div></div>
+
+<!-- Modal podglądu 720p -->
+<div class="modal" id="photoModal">
+  <div class="box">
+    <button class="close" id="closeModal">Zamknij ✖</button>
+    <img id="modalImg" alt="Podgląd 720p"/>
+  </div>
+</div>
+
 <script>
 (()=>{
-  const STORAGE_KEY='fit129_simple';
+  const STORAGE_KEY='fit_v129_data';
   const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
-  function getAll(){ try{const r=localStorage.getItem(STORAGE_KEY); return r?JSON.parse(r):{photos:[],opts:{reportFolder:''}};}catch(e){return {photos:[],opts:{reportFolder:''}};}
+
+  function getAll(){ try{ const r=localStorage.getItem(STORAGE_KEY); return r?JSON.parse(r):{photos:[],diet:{notes:'',myMeals:''},opts:{folder:''}}; }catch(e){ return {photos:[],diet:{notes:'',myMeals:''},opts:{folder:''}}; } }
+  function saveAll(o){ localStorage.setItem(STORAGE_KEY, JSON.stringify(o)); }
+
+  /* Tabs */
+  function showTab(id){ $$('main > section').forEach(s=>s.classList.add('hidden')); const el = document.getElementById(id); if(el) el.classList.remove('hidden'); }
+  function initTabs(){ const bar=$('#tabs'); const first=bar.querySelector('button.active')||bar.querySelector('button[data-tab]'); if(first) showTab(first.dataset.tab);
+    bar.addEventListener('click',e=>{ const btn=e.target.closest('button[data-tab]'); if(!btn) return; $$('#tabs button').forEach(b=>b.classList.toggle('active', b===btn)); showTab(btn.dataset.tab); });
   }
-  function saveAll(o){ localStorage.setItem(STORAGE_KEY,JSON.stringify(o)); }
-  function showTab(id){ $$('main > section').forEach(s=>s.classList.add('hidden')); $('#'+id).classList.remove('hidden'); }
-  function initTabs(){ $('#tabs').addEventListener('click',e=>{const b=e.target.closest('button[data-tab]'); if(!b) return; $$('#tabs button').forEach(x=>x.classList.toggle('active',x===b)); showTab(b.dataset.tab); }); }
-  function toggleTheme(){ document.body.classList.toggle('dark'); }
+
+  /* Theme */
+  function applyTheme(){ const prefersDark=window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches; const mode=document.body.classList.contains('dark')?'dark':'light'; $('#modeInfo').textContent=mode; }
+  function toggleTheme(){ document.body.classList.toggle('dark'); applyTheme(); }
+
+  /* Photos + blur + modal */
   function today(){ return new Date().toISOString().slice(0,10); }
-  function addPhotos(files){ const date=$('#photoDate').value||today(); const all=getAll(); const perDay=all.photos.filter(p=>p.date===date).length; const allowed=Math.max(0,5-perDay); if(allowed<=0){alert('Limit 5/dzień');return;} Array.from(files).slice(0,allowed).forEach(file=>{ const fr=new FileReader(); fr.onload=()=>{ const img=new Image(); img.onload=()=>{ const W=img.width,H=img.height; const c=document.createElement('canvas'); c.width=W;c.height=H; const ctx=c.getContext('2d'); ctx.drawImage(img,0,0); const faceH=Math.round(H*0.22); ctx.filter='blur(14px)'; ctx.fillStyle='rgba(0,0,0,0.1)'; ctx.fillRect(Math.round(W*0.2),0,Math.round(W*0.6),faceH); ctx.filter='none'; const data=c.toDataURL('image/jpeg',0.92); all.photos.push({date,ts:Date.now(),data}); saveAll(all); renderGallery(); }; img.src=fr.result; }; fr.readAsDataURL(file); }); }
-  function renderGallery(){ const box=$('#photoGallery'); const all=getAll(); const list=all.photos.slice(-12); box.innerHTML=''; if(!list.length){ box.textContent='Brak zdjęć.'; return; } list.forEach(p=>{ const i=document.createElement('img'); i.src=p.data; i.title=p.date; i.addEventListener('click',ev=>{ if(ev.altKey){ if(confirm('Usunąć?')){ const all=getAll(); all.photos=all.photos.filter(x=>x.ts!==p.ts); saveAll(all); renderGallery(); } return;} openModal(p.data); }); box.appendChild(i); }); }
-  function openModal(src){ const i=new Image(); i.onload=()=>{ const maxW=1280,maxH=720; let w=i.width,h=i.height,r=Math.min(maxW/w,maxH/h); if(r<1){w=Math.round(w*r);h=Math.round(h*r);} const c=document.createElement('canvas'); c.width=w;c.height=h; c.getContext('2d').drawImage(i,0,0,w,h); $('#modalImg').src=c.toDataURL('image/jpeg',0.95); $('#photoModal').style.display='flex'; }; i.src=src; }
-  $('#closeModal')?.addEventListener('click',()=>$('#photoModal').style.display='none'); $('#photoModal')?.addEventListener('click',e=>{ if(e.target.id==='photoModal') $('#photoModal').style.display='none'; });
-  function renderMeals(){ const box=$('#mealsGrid'); const B=['Owsianka P40/C60/F15','Jajecznica P35/C10/F20','Skyr + płatki P30/C40/F5']; const L=['Kurczak + ryż P45/C70/F10','Łosoś + ziemniaki P40/C50/F20']; const D=['Sałatka grecka P20/C15/F25','Tortilla z indykiem P35/C45/F10']; const mk=(t,arr)=>'<div style="background:var(--input);border:1px solid var(--border);border-radius:10px;padding:10px"><h4>'+t+'</h4>'+arr.map(x=>'• '+x).join('<br>')+'</div>'; box.innerHTML=mk('Śniadanie',B)+mk('Obiad',L)+mk('Kolacja',D); }
-  function downloadReport(){ const all=getAll(); const txt=`FIT Raport\\nData: ${new Date().toLocaleString()}\\nWersja: v12.9.0\\nZakładka: #jedzenie\\nLiczba zdjęć: ${all.photos.length}`; const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([txt],{type:'text/plain;charset=utf-8'})); a.download='FIT_raport.txt'; a.click(); }
-  function saveFolder(){ const all=getAll(); all.opts.reportFolder=$('#reportFolder').value.trim(); saveAll(all); $('#folderInfo').textContent=all.opts.reportFolder?('Ustawiono: '+all.opts.reportFolder):'Brak ustawionej ścieżki.'; }
-  // Bind
-  initTabs(); renderMeals(); renderGallery();
-  $('#btnTheme').addEventListener('click',toggleTheme);
-  $('#photoFile').addEventListener('change',e=>{ if(e.target.files?.length) addPhotos(e.target.files); });
-  $('#btnDownloadReport').addEventListener('click',downloadReport);
-  $('#btnSaveFolder').addEventListener('click',saveFolder);
+  function addPhotos(files){
+    const date=$('#photoDate').value || today();
+    const all=getAll();
+    const perDay=all.photos.filter(p=>p.date===date).length;
+    const allowed=Math.max(0, 5 - perDay);
+    if(allowed<=0){ alert('Limit 5 zdjęć na ten dzień.'); return; }
+    Array.from(files).slice(0,allowed).forEach(file=>{
+      const fr=new FileReader();
+      fr.onload=()=>{
+        const img=new Image();
+        img.onload=()=>{
+          const W=img.width, H=img.height;
+          const c=document.createElement('canvas'); c.width=W; c.height=H;
+          const ctx=c.getContext('2d'); ctx.drawImage(img,0,0);
+          // Auto-blur twarzy (pas górny ok. 22% wysokości, centralnie)
+          const faceH=Math.round(H*0.22);
+          ctx.filter='blur(14px)'; ctx.fillStyle='rgba(0,0,0,0.1)';
+          ctx.fillRect(Math.round(W*0.2), 0, Math.round(W*0.6), faceH);
+          ctx.filter='none';
+          const data=c.toDataURL('image/jpeg',0.92);
+          all.photos.push({date, ts:Date.now(), data});
+          saveAll(all); renderGallery();
+        };
+        img.src=fr.result;
+      };
+      fr.readAsDataURL(file);
+    });
+  }
+  function renderGallery(){
+    const box=$('#photoGallery'); const all=getAll(); const list=all.photos.slice(-12);
+    box.innerHTML='';
+    if(!list.length){ box.textContent='Brak zdjęć.'; return; }
+    list.forEach(p=>{
+      const i=document.createElement('img'); i.src=p.data; i.title=p.date;
+      i.addEventListener('click',ev=>{
+        if(ev.altKey){ if(confirm('Usunąć to zdjęcie?')){ const all=getAll(); all.photos=all.photos.filter(x=>x.ts!==p.ts); saveAll(all); renderGallery(); } return; }
+        openModal(p.data);
+      });
+      box.appendChild(i);
+    });
+  }
+  function openModal(src){
+    const i=new Image();
+    i.onload=()=>{
+      const maxW=1280, maxH=720;
+      let w=i.width, h=i.height, r=Math.min(maxW/w, maxH/h);
+      if(r<1){ w=Math.round(w*r); h=Math.round(h*r); }
+      const c=document.createElement('canvas'); c.width=w; c.height=h;
+      c.getContext('2d').drawImage(i,0,0,w,h);
+      $('#modalImg').src = c.toDataURL('image/jpeg',0.95);
+      $('#photoModal').style.display='flex';
+    };
+    i.src=src;
+  }
+  $('#closeModal')?.addEventListener('click',()=>$('#photoModal').style.display='none');
+  $('#photoModal')?.addEventListener('click',e=>{ if(e.target.id==='photoModal') $('#photoModal').style.display='none'; });
+
+  /* Demo chart */
+  function renderChart(){
+    const c=document.getElementById('mChart'); const ctx=c.getContext('2d');
+    ctx.clearRect(0,0,c.width,c.height);
+    const dark=document.body.classList.contains('dark');
+    const cols=dark?['#60a5fa','#22c55e','#fbbf24','#f472b6']:['#2563eb','#16a34a','#d97706','#db2777'];
+    const axis=dark?'#9fb0c9':'#64748b', grid=dark?'#334155':'#e5e7eb';
+    const pad=26, top=14, right=8, bottom=20, W=c.width-pad-right, H=c.height-top-bottom;
+    const yMin=60,yMax=100; // demo
+    ctx.strokeStyle=grid; ctx.fillStyle=axis; ctx.lineWidth=1;
+    for(let i=0;i<=4;i++){ const t=i/4, y=top+H-t*H; ctx.beginPath(); ctx.moveTo(pad,y); ctx.lineTo(pad+W,y); ctx.stroke(); ctx.fillText((yMin+t*(yMax-yMin)).toFixed(0),4,y+3);}
+    ctx.fillText('demo', pad, c.height-4);
+    ctx.strokeStyle=cols[0]; ctx.lineWidth=2; ctx.beginPath();
+    for(let k=0;k<10;k++){ const x=pad+(k/9)*W; const y=top+(1-((70+Math.sin(k)*5 - yMin)/(yMax-yMin)))*H; if(k===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); }
+    ctx.stroke();
+  }
+
+  /* Dieta – demo */
+  function renderMeals(){
+    const B=['Owsianka P40/C60/F15','Jajecznica P35/C10/F20','Skyr + płatki P30/C40/F5','Omlet warzywny P30/C15/F15','Tost + jajko P25/C30/F10'];
+    const L=['Kurczak + ryż P45/C70/F10','Łosoś + ziemniaki P40/C50/F20','Indyk + makaron P40/C60/F12','Wołowina + kasza P45/C50/F18','Chili con carne P40/C55/F12'];
+    const D=['Sałatka grecka P20/C15/F25','Tortilla z indykiem P35/C45/F10','Twarożek + owoce P25/C25/F5','Zupa krem dynia P10/C20/F8','Łosoś + sałatka P35/C10/F20'];
+    const mk=(arr)=>arr.map(x=>'<div>• '+x+'</div>').join('');
+    document.getElementById('bMeals').innerHTML=mk(B);
+    document.getElementById('lMeals').innerHTML=mk(L);
+    document.getElementById('dMeals').innerHTML=mk(D);
+  }
+
+  /* Jedzenie – TXT */
+  function downloadReport(){
+    const all=getAll(); const txt=`FIT Raport\nData: ${new Date().toLocaleString()}\nWersja: v12.9.0\nZakładka: #jedzenie\nLiczba zdjęć: ${all.photos.length}`;
+    const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([txt],{type:'text/plain;charset=utf-8'})); a.download='FIT_raport.txt'; a.click();
+  }
+
+  /* Opcje */
+  function saveFolder(){ const all=getAll(); all.opts.folder=$('#reportFolder').value.trim(); saveAll(all); $('#folderInfo').textContent=all.opts.folder?('Ustawiono: '+all.opts.folder):'Brak ustawionej ścieżki.'; }
+
+  /* Bind + init */
+  function init(){
+    initTabs();
+    $('#btnTheme').addEventListener('click',()=>{toggleTheme(); renderChart();});
+    $('#photoFile').addEventListener('change',e=>{ if(e.target.files?.length) addPhotos(e.target.files); });
+    $('#btnDownloadReport').addEventListener('click',downloadReport);
+    $('#btnSaveFolder').addEventListener('click',saveFolder);
+    $('#photoDate').value = (new Date()).toISOString().slice(0,10);
+    $('#dateInfo').textContent = (new Date()).toLocaleString();
+    renderMeals();
+    renderGallery();
+    renderChart();
+    applyTheme();
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', init, {once:true}); else init();
 })();
 </script>
-</body></html>
+</body>
+</html>
