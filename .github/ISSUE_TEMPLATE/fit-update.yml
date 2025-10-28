@@ -1,27 +1,31 @@
 name: "FIT Update"
-description: "Wgraj/zmień plik w repo"
+description: "Wgraj/zmień plik w repo – wklej CAŁY kod pliku"
 title: "[FIT-UPDATE] Podmiana pliku"
 labels: ["fit-update"]
 body:
   - type: input
     id: path
     attributes:
-      label: Ścieżka pliku w repo (np. index.html)
-      placeholder: index.html
+      label: Ścieżka pliku
+      description: "Np. index.html, index_v12_3_1.html, update.json, assets/app.css"
+      placeholder: "index.html"
     validations:
       required: true
   - type: textarea
     id: message
     attributes:
       label: Opis commita
-      placeholder: feat: update index.html
+      placeholder: "feat: update index to v12.3.1"
     validations:
       required: true
   - type: textarea
     id: content
     attributes:
-      label: Treść pliku (wklej TU)
-      description: "Wklej cały kod pliku. Nic więcej."
-      render: shell
+      label: Treść pliku
+      description: "Wklej CAŁY kod między potrójne backticki"
+      value: |
+        ```html
+        <!-- Wklej tutaj cały kod pliku -->
+        ```
     validations:
       required: true
