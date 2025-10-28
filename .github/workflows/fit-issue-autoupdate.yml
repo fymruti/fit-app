@@ -1,0 +1,94 @@
+name: FIT Auto Update via Issue (v1)
+
+on:
+  issues:
+    types: [opened, edited]
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  update-from-issue:
+    if: contains(github.event.issue.labels.*.name, 'fit-update')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Parse issue body
+        id: parse
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = context.payload.issue.body || '';
+            // Wyciągnij ścieżkę
+            const pathMatch = body.match(/### Ścieżka pliku\s+([\s\S]*?)\n{2,}/i) || body.match(/### Ścieżka pliku\s*?\n+([^\n]+)\n/i);
+            const path = pathMatch ? pathMatch[1].trim() : null;
+
+            // Opis commita
+            const msgMatch = body.match(/### Opis commita\s+([\s\S]*?)\n{2,}/i) || body.match(/### Opis commita\s*?\n+([^\n]+)\n/i);
+            const msg = msgMatch ? msgMatch[1].trim() : null;
+
+            // Treść pliku – blok kodu w ``` ```
+            let content = null;
+            const codeBlock = body.match(/### Treść pliku[\s\S]*?```[a-zA-Z0-9]*\n([\s\S]*?)\n```/);
+            if (codeBlock) {
+              content = codeBlock[1];
+            } else {
+              // fallback: wszystko po nagłówku
+              const idx = body.indexOf('### Treść pliku');
+              if (idx >= 0) content = body.slice(idx + '### Treść pliku'.length).trim();
+            }
+
+            if (!path || !msg || !content) {
+              core.setFailed(`Brak wymaganych pól. path=${!!path}, msg=${!!msg}, content=${!!content}`);
+              return;
+            }
+
+            // zapisz wyniki
+            core.setOutput('path', path);
+            core.setOutput('msg', msg);
+
+            // zapisz treść do pliku tymczasowego
+            const fs = require('fs');
+            fs.mkdirSync('tmp', { recursive: true });
+            fs.writeFileSync('tmp/file.txt', content, 'utf8');
+
+      - name: Ensure directory exists
+        run: mkdir -p "$(dirname '${{ steps.parse.outputs.path }}')"
+
+      - name: Move content into place
+        run: mv tmp/file.txt "${{ steps.parse.outputs.path }}"
+
+      - name: Commit & push
+        env:
+          MSG: ${{ steps.parse.outputs.msg }}
+        run: |
+          git config user.name  "fit-bot"
+          git config user.email "fit-bot@users.noreply.github.com"
+          git add "${{ steps.parse.outputs.path }}"
+          git commit -m "$MSG" || echo "No changes"
+          git push
+
+      - name: Comment with preview link
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const path = '${{ steps.parse.outputs.path }}';
+            const url = `https://fymruti.github.io/fit-app/${path}`;
+            await github.rest.issues.createComment({
+              ...context.repo,
+              issue_number: context.issue.number,
+              body: `✅ Wgrano: \`${path}\`\nPodgląd: ${url}`
+            });
+
+      - name: Close issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.update({
+              ...context.repo,
+              issue_number: context.issue.number,
+              state: 'closed'
+            });
