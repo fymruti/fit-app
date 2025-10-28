@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>FIT – All-in-One v12.4.0 (Green Test)</title>
+<style>
+:root{
+  --bg:#e8f5e9;           /* jasna zieleń tła */
+  --ink:#0f172a;
+  --accent:#22c55e;       /* zielony akcent */
+  --accent-dark:#16a34a;
+  --card:#ffffff;
+  --border:#cbd5e1;
+}
+body.dark{
+  --bg:#052a1a;           /* ciemna zieleń dla dark mode */
+  --ink:#e2f5ea;
+  --accent:#34d399;
+  --accent-dark:#10b981;
+  --card:#08301f;
+  --border:#14532d;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--ink);transition:background .2s,color .2s}
+header{position:sticky;top:0;z-index:10;display:grid;grid-template-columns:1fr auto;gap:8px;padding:10px;background:linear-gradient(90deg,var(--accent),var(--accent-dark));color:#fff;box-shadow:0 3px 8px rgba(0,0,0,.2)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap}
+.tabs button{padding:8px 12px;border:0;border-radius:10px;font-weight:700;cursor:pointer;background:#fff;color:#064e3b}
+body.dark .tabs button{background:#14532d;color:#d1fae5}
+.tabs button.active{background:#065f46;color:#fff}
+body.dark .tabs button.active{background:#34d399;color:#052a1a}
+.rightbar{display:flex;gap:8px;align-items:center}
+.rightbar button{padding:8px 10px;border-radius:10px;border:1px solid rgba(255,255,255,.4);background:rgba(255,255,255,.15);color:#fff;cursor:pointer}
+main{max-width:1100px;margin:0 auto;padding:12px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;box-shadow:0 6px 14px rgba(0,0,0,.06);margin:12px 0}
+.hidden{display:none}
+.kpi{display:flex;gap:8px;flex-wrap:wrap}
+.kpi .pill{background:#fff;color:#065f46;border:1px solid var(--border);border-radius:999px;padding:4px 8px;font-size:12px}
+body.dark .kpi .pill{background:#14532d;color:#dcfce7;border-color:#14532d}
+</style>
+</head>
+<body>
+<header>
+  <div class="tabs" id="tabs">
+    <button data-tab="start">Start</button>
+    <button data-tab="sylwetka">Sylwetka</button>
+    <button data-tab="dieta">Dieta</button>
+    <button data-tab="jedzenie">Jedzenie</button>
+    <button data-tab="suple">Suple</button>
+  </div>
+  <div class="rightbar">
+    <button id="btnTheme" title="Jasny/Ciemny">🌙/☀️</button>
+  </div>
+</header>
+
+<main>
+  <section id="start" class="card">
+    <h2>🎯 FIT v12.4.0 — Green Background Test</h2>
+    <p>Ta wersja testowa ustawia <b>zielone tło aplikacji</b> oraz pozostawia działające zakładki i tryb ciemny.</p>
+    <div class="kpi">
+      <div class="pill">Motyw: <b id="st-theme">–</b></div>
+      <div class="pill">Zakładka: <b id="st-tab">#start</b></div>
+    </div>
+  </section>
+
+  <section id="sylwetka" class="card hidden"><h2>🧍 Sylwetka</h2><p>Wizualizacja i pomiary.</p></section>
+  <section id="dieta" class="card hidden"><h2>🍽️ Dieta</h2><p>Podsumowanie TDEE i notatki.</p></section>
+  <section id="jedzenie" class="card hidden"><h2>🛒 Jedzenie</h2><p>Lista zakupów.</p></section>
+  <section id="suple" class="card hidden"><h2>💊 Suple</h2><p>Preferencje suplementacji.</p></section>
+</main>
+
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const $$ = s => Array.from(document.querySelectorAll(s));
+
+  function applyTheme(initial=false){
+    const saved = localStorage.getItem('fit_theme');
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const mode = saved || (prefersDark ? 'dark' : 'light');
+    document.body.classList.toggle('dark', mode === 'dark');
+    if(!saved) localStorage.setItem('fit_theme', mode);
+    $('#st-theme').textContent = mode;
+    if(initial){
+      $('#btnTheme').textContent = document.body.classList.contains('dark') ? '☀️/🌙' : '🌙/☀️';
+    }
+  }
+  function toggleTheme(){
+    const current = localStorage.getItem('fit_theme') || 'light';
+    const next = current === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('fit_theme', next);
+    applyTheme();
+    $('#btnTheme').textContent = document.body.classList.contains('dark') ? '☀️/🌙' : '🌙/☀️';
+  }
+
+  function showTab(id){
+    $$('main > section').forEach(s => s.classList.add('hidden'));
+    const el = document.getElementById(id);
+    if(el) el.classList.remove('hidden');
+    $$('#tabs button').forEach(b => b.classList.toggle('active', b.dataset.tab === id));
+    $('#st-tab').textContent = '#' + id;
+    if(location.hash !== '#' + id) history.replaceState(null, '', '#' + id);
+  }
+
+  function initTabs(){
+    const bar = document.getElementById('tabs');
+    bar.addEventListener('click', e => {
+      const btn = e.target.closest('button[data-tab]');
+      if(!btn) return;
+      showTab(btn.dataset.tab);
+    });
+    const first = (location.hash || '#start').replace('#','');
+    showTab(first);
+  }
+
+  function bind(){
+    applyTheme(true);
+    initTabs();
+    $('#btnTheme').addEventListener('click', toggleTheme);
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', bind, {once:true});
+  } else {
+    bind();
+  }
+})();
+</script>
+</body>
+</html>
